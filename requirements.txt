@@ -1,0 +1,9 @@
+absl-py
+casadi
+faulthandler
+ipython
+matplotlib
+numpy
+pyquaternion
+rospkg
+scipy

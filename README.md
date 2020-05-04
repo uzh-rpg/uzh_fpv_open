@@ -1,4 +1,4 @@
-# uzh_fpv
+# uzh_fpv_open
 
 ![if3](http://rpg.ifi.uzh.ch/datasets/uzh-fpv/trajs/indoor_forward_3_snapdragon_with_gt.gif)
 ![i452](http://rpg.ifi.uzh.ch/datasets/uzh-fpv/trajs/indoor_45_2_snapdragon_with_gt.gif)
@@ -78,8 +78,8 @@ catkin config --init --mkdirs --extend /opt/ros/melodic --merge-devel --cmake-ar
 
 cd src
 git clone git@github.com:catkin/catkin_simple.git
-git clone git@github.com:uzh-rpg/uzh_fpv.git
-cd uzh_fpv
+git clone git@github.com:uzh-rpg/uzh_fpv_open.git
+cd uzh_fpv_open
 pip install -r requirements.txt
 
 catkin build

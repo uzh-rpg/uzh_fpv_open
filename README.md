@@ -4,7 +4,7 @@
 ![i452](http://rpg.ifi.uzh.ch/datasets/uzh-fpv/trajs/indoor_45_2_snapdragon_with_gt.gif)
 ![of1](http://rpg.ifi.uzh.ch/datasets/uzh-fpv/trajs/outdoor_forward_1_snapdragon_with_gt.gif)
 
-This is additional code that we release under the GPL-3.0 license to accompany [the UZH FPV dataset](http://rpg.ifi.uzh.ch/uzh-fpv.html).
+This is additional code that we release under the GPL-3.0 license to accompany [the UZH FPV dataset](https://fpv.ifi.uzh.ch/).
 It has the following main features:
 
 * [Code to read the raw Leica measurements](python/uzh_fpv/leica.py).
@@ -90,7 +90,7 @@ Note that you can use softlinks (`ln -s /actual/location .`):
 
 | Folder | Description |
 |-------|--------| 
-| raw | Contains raw data: unzipped "Leica" folder from the [public dataset](http://rpg.ifi.uzh.ch/uzh-fpv.html) or the `raw` folder from the internal dataset. |
+| raw | Contains raw data: unzipped "Leica" folder from the [public dataset](https://fpv.ifi.uzh.ch/?page_id=50) or the `raw` folder from the internal dataset. |
 | output | Contains the bags (not zips) from the public dataset, or the contents of `v2` from the internal dataset. |
 
 # Usage

@@ -59,23 +59,38 @@ def initial_t_G_L():
     return -1.
 
 
-def sequenceString():
+def envCamString():
     if FLAGS.env == 'i':
         result = 'indoor_'
     else:
         assert FLAGS.env == 'o'
         result = 'outdoor_'
     if FLAGS.cam == 'fw':
-        result = result + 'forward_'
+        result = result + 'forward'
     else:
         assert FLAGS.cam == '45'
-        result = result + '45_'
-    result = result + FLAGS.nr
+        result = result + '45'
     return result
 
 
+def sequenceString():
+    return envCamString() + '_' + FLAGS.nr
+
+
+def sensorString():
+    if FLAGS.sens == 'davis':
+        return 'davis'
+    else:
+        assert FLAGS.sens == 'snap'
+        return 'snapdragon'
+
+
 def sequenceSensorString():
-    result = sequenceString() + '_'
+    return sequenceString() + '_' + sensorString()
+
+
+def calibString():
+    result = envCamString() + '_calib_'
     if FLAGS.sens == 'davis':
         result = result + 'davis'
     else:
@@ -102,6 +117,20 @@ def groundTruthZipPath():
 
 def noGroundTruthZipPath():
     return os.path.join(repoRoot(), 'output', sequenceSensorString() + '.zip')
+
+
+def unzippedGtPath():
+    wd = os.path.join(repoRoot(), 'output')
+    wgt = sequenceSensorString() + '_with_gt'
+    result = os.path.join(wd, wgt)
+    if not os.path.exists(result):
+        print('Unzipping %s' % wgt)
+        os.system('cd %s && unzip %s -d %s' % (wd, wgt + '.zip', wgt))
+    return result
+
+
+def calibPath():
+    return os.path.join(repoRoot(), 'calib', calibString())
 
 
 def minImuGroundTruthOdometryBagPath():

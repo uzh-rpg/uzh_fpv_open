@@ -113,7 +113,7 @@ if __name__ == '__main__':
         while im_i + 1 < len(imt) and abs(imt[im_i + 1] - gtt[gt_i]) <= abs(imt[im_i] - gtt[gt_i]):
             im_i = im_i + 1
         # Advance gt until closest:
-        # leq, because Leuti has given subsequent estimates with same time.
+        # leq, because some participants give subsequent estimates with same time.
         while gt_i + 1 < len(gtt) and abs(imt[im_i] - gtt[gt_i + 1]) <= abs(imt[im_i] - gtt[gt_i]):
             gt_i = gt_i + 1
         if im_i == len(imt) or gt_i == len(gtt) - 1:

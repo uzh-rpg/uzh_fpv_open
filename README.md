@@ -11,6 +11,7 @@ It has the following main features:
 * Code to assess the quality of the provided ground truth (see below for instructions):
   * By matching the predicted gyro output to the actual gyro output, as proposed [in this issue by Vladyslav Usenko](https://github.com/uzh-rpg/IROS2019-FPV-VIO-Competition/issues/6).
   * By matching the predicted position of the prism to Leica measurements.
+  * By projecting virtual points into the camera frame to qualitatively assess the rotation estimates.
 * As a serendipitous byproduct, [an implementation of a time-differentiable continuous trajectory representation](python/uzh_fpv/bspline_opt.py), see the **[quick tutorial](spline_tutorial.md)**.
 
 This repository does **not** contain the code that was used to generate the ground truth.
@@ -20,7 +21,9 @@ This repository does **not** contain the code that was used to generate the grou
 1. [Citing](#citing)
 2. [Installation](#installation)
 3. [Usage](#usage)
-   * [Calculating the Leica error of an existing ground truth](#calculating-the-leica-error-of-an-existing-ground-truth)
+   * [Detailed instructions](#detailed-instructions)
+      * [Evaluating the error between ground truth and Leica measurements](gt_to_leica_error.md)
+      * [Rotation sanity check using projected virtual points](#Rotation-sanity-check-using-projected-virtual-points)
    * [Overview of other scripts](#overview-of-other-scripts)
 4. [Acknowledgements](#acknowledgements)
 
@@ -78,6 +81,7 @@ catkin config --init --mkdirs --extend /opt/ros/melodic --merge-devel --cmake-ar
 
 cd src
 git clone git@github.com:catkin/catkin_simple.git
+# RPG: uzh_fpv here and below for our internal version.
 git clone git@github.com:uzh-rpg/uzh_fpv_open.git
 cd uzh_fpv_open
 pip install -r requirements.txt
@@ -90,65 +94,38 @@ Note that you can use softlinks (`ln -s /actual/location .`):
 
 | Folder | Description |
 |-------|--------| 
+| calib | Contains the unzipped calibration files. |
 | raw | Contains raw data: unzipped "Leica" folder from the [public dataset](https://fpv.ifi.uzh.ch/?page_id=50) or the `raw` folder from the internal dataset. |
-| output | Contains the bags (not zips) from the public dataset, or the contents of `v2` from the internal dataset. |
+| output | Contains the bags (not zips) from the public dataset, or the contents of `v2` (or later) from the internal dataset. |
 
 # Usage
 
 Flags defined in [python/uzh_fpv/flags.py](python/uzh_fpv/flags.py) are used to specify which sequence you want to work with. For example, to use `indoor_45_2_snapdragon`, you would use flags `--env=i --cam=45 --nr=2 --sens=snap`.
 Graphical output can in most scripts be suppressed with `--nogui`.
 
-## Calculating the Leica error of an existing ground truth
+## Detailed instructions
 
-Specify which dataset to use with the above flags. See the [spline tutorial](spline_tutorial.md) to better understand
-the involved optimizations.
+### Evaluating the error between ground truth and Leica measurements
 
-### 1. Create a cached bag which contains only the necessary data:
-
-```bash
-python scripts/make_min_imu_gto_bag.py
-```
-
-### 2. Fit a spline to the ground truth
-
-In order to make time offset optimization well-behaved, we approximate the ground truth with a spline.
-This spline is then used to help estimate the time offset. 
-For the final result, the spline is discarded and the ground truth is again used directly.
-```bash
-# Spline is written into the 'intermediate' folder in project root.
-python scripts/fit_spline_to_gt.py
-```
-Parameters that could be tweaked in this step are `--dt` and `--errs`.
-We suggest to simply use the default values (no need to specify).
-They control spline resolution (period between control nodes) and the amount of ground truth samples that are used to express the optimized cost function.
-Using every single ground truth sample would be unnecessarily costly. 
-See [scripts/evaluate_discretizations.py](scripts/evaluate_discretizations.py).
-
-### 3. Align the spline with the Leica measurements
-
-While this will provide a good estimate of disagreement between the ground truth and the Leica measurements, the main
-goal of this step is to establish the time offset between ground truth = sensor timestamps and Leica timestamps.
-```bash
-# Alignement parameters are written into the 'intermediate' folder in project root.
-python scripts/align_spline_to_leica.py
-```
-
-### 4. Get errors from ground truth alignment
-
-Takes the initial guess from the alignment of the spline to the Leica measurements to align the full ground truth to 
-the Leica measurements and plots the Leica errors. 
-```bash
-python scripts/report_aligned_gt_error.py
-```
 ![xy_traj](examples/xy_traj.png)
-![xyzt_traj](examples/xyzt_traj.png)
-![leica_err](examples/leica_err.png)
 
-### 5. Summarize the results from all sequences
-```bash
-python scripts/summarize_gt_error.py
+See the full instructions [here](gt_to_leica_error.md).
+
+### Rotation sanity check using projected virtual points
+
+![proj](examples/proj.png)
+
+` python scripts/render_gt_projection.py `
+
+Rendered images are output in `plots/SEQUENCE_STRING/gt_projection`.
+
+Per default, the ground truth trajectory is used for rendering. It can be replaced with an estimate according to this specification by adding a flag `--estim=PATH_TO_TXT_FILE`. In that case, the rendering is output to `plots/SEQUENCE_STRING/es_projection`.
+
+These outputs can be converted into an mp4 video with the following command:
+
 ```
-The results of this for the currently published ground truth are reported [in the GitHub issues](https://github.com/uzh-rpg/uzh_fpv_open/issues).
+ffmpeg -r 30 -i %06d.png -c:v libx264 -vf fps=25 -pix_fmt yuv420p out.mp4
+```
 
 ## Overview of other scripts
 
@@ -160,7 +137,7 @@ Found in the scripts folder. Can be categorized as follows:
 
 ### Dataset inspection
 
-`compare_gyro.py` (as proposed [in this issue by Vladyslav Usenko](https://github.com/uzh-rpg/IROS2019-FPV-VIO-Competition/issues/6)), `plot_leica.py`, `plot_leica_vs_gt.py`
+`compare_gyro.py` (as proposed [in this issue by Vladyslav Usenko](https://github.com/uzh-rpg/IROS2019-FPV-VIO-Competition/issues/6)), `plot_leica.py`, `plot_leica_vs_gt.py`, `match_davis_to_snapdragon_gt.py`(matches davis to snapdragon groundtruth according to a provided time-offset)
 
 ### Dataset publishing
 
